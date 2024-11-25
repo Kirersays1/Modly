@@ -2,17 +2,25 @@ import { Router } from 'express'
 import { body, param } from 'express-validator'
 import { createProduct, deleteProduct, getProductById, getProducts, updateAvailability, updateProduct } from './handlers/product'
 import { handleInputErrors } from './middleware'
+import {createUser, test} from "./handlers/user";
 
 const router = Router()
 
 // Routing
-router.get('/', getProducts)
-router.get('/:id', 
+router.get('/user/test', test)
+/*router.get('/:id',
     param('id').isInt().withMessage('ID no válido'),
     handleInputErrors,
     getProductById
-)
+)*/
+router.post('/user/create', createUser)
 
+router.get('/',(req,res) => {
+    res.json('Desde GET')
+})
+
+
+/*
 router.post('/', 
     // Validación
     body('name')
@@ -50,5 +58,5 @@ router.delete('/:id',
     handleInputErrors,
     deleteProduct
 )
-
+*/
 export default router
