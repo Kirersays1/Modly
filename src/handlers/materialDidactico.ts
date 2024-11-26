@@ -1,25 +1,19 @@
 import { Request, Response } from 'express'
-import User from '../models/User.model'
+import Material from '../models/Material.model'
 import colors from "colors";
 
-export const test = async (req: Request, res: Response) => {
-   console.log(colors.green('Recibi la peticion test GET'))
-    res.json('Enviado correctamente')
-}
-
-export const createUser = async (req: Request, res: Response) => {
+export const createMaterial = async (req: Request, res: Response) => {
     try {
         console.log(colors.blue(req.body))
-        const user = await User.create(req.body)
+        const user = await Material.create(req.body)
         res.json({data: user})
     } catch (error) {
         console.log(colors.red(error))
     }
 }
 
-export const getUsers = async (req: Request, res: Response) => {
+/*export const getUsers = async (req: Request, res: Response) => {
     try {
-        console.log(colors.blue("Solicitaron a todos los usuarios"))
         const products = await User.findAll({
             order: [
                 ['id_usuario', 'DESC']
@@ -31,7 +25,6 @@ export const getUsers = async (req: Request, res: Response) => {
     }
 }
 
-/*
 export const getProductById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params

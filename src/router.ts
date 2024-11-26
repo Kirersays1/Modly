@@ -1,23 +1,29 @@
 import { Router } from 'express'
 import { body, param } from 'express-validator'
-import { createProduct, deleteProduct, getProductById, getProducts, updateAvailability, updateProduct } from './handlers/product'
 import { handleInputErrors } from './middleware'
-import {createUser, test} from "./handlers/user";
+import {createUser, getUsers, test} from "./handlers/user";
+import {createMateria} from "./handlers/materia";
+import {createMaterial} from "./handlers/materialDidactico";
+
 
 const router = Router()
 
-// Routing
+router.get('/',(req,res) => {
+    res.json('Desde GET')
+})
+
+//******************************************************* Router Usuario************************************************
 router.get('/user/test', test)
+router.post('/user/create', createUser)
+router.get('/user/getAll', getUsers)
 /*router.get('/:id',
     param('id').isInt().withMessage('ID no válido'),
     handleInputErrors,
     getProductById
 )*/
-router.post('/user/create', createUser)
 
-router.get('/',(req,res) => {
-    res.json('Desde GET')
-})
+
+
 
 
 /*
@@ -59,4 +65,11 @@ router.delete('/:id',
     deleteProduct
 )
 */
+
+//******************************************************* Router Materia************************************************
+router.post('/materia/create', createMateria) //Insertar materia
+
+//******************************************** Router Material Didactico************************************************
+router.post('/materialDidactico/create', createMaterial) //Insertar material Didactico
+
 export default router

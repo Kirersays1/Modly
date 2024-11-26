@@ -1,11 +1,22 @@
-import { Request, Response } from 'express'
-import Product from '../models/Product.model'
+import { Request, Response } from 'express'
+import Materia from '../models/Materia.model'
+import colors from "colors";
 
-export const getProducts = async (req: Request, res: Response) => {
+export const createMateria = async (req: Request, res: Response) => {
     try {
-        const products = await Product.findAll({
+        console.log(colors.blue(req.body))
+        const user = await Materia.create(req.body)
+        res.json({data: user})
+    } catch (error) {
+        console.log(colors.red(error))
+    }
+}
+
+/*export const getUsers = async (req: Request, res: Response) => {
+    try {
+        const products = await User.findAll({
             order: [
-                ['price', 'DESC']
+                ['id_usuario', 'DESC']
             ]
         })
         res.json({data: products})
@@ -84,4 +95,4 @@ export const deleteProduct = async (req: Request, res: Response) => {
     
     await product.destroy()
     res.json({data: 'Producto Eliminado'})
-}
+}*/
