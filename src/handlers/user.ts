@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import User from '../models/User.model'
+import {check, validationResult} from 'express-validator'
 import colors from "colors";
 
 export const test = async (req: Request, res: Response) => {
@@ -9,7 +10,31 @@ export const test = async (req: Request, res: Response) => {
 
 export const createUser = async (req: Request, res: Response) => {
     try {
+
+
+        //Validar los campos de la peticion
+        await check('nombre').notEmpty().withMessage('El campo nombre no puede ir vacio').run(req)
+        await check('email').notEmpty().withMessage('El campo email no puede ir vacio').run(req)
+        await check('password').notEmpty().withMessage('El campo password no puede ir vacio').run(req)
+        await check('rol').notEmpty().withMessage('El campo rol no puede ir vacio').run(req)
+
+
+        let errors = validationResult(req)
+
+        if (!errors.isEmpty()) {
+
+            //Mostrar en consola que hubo un error
+            console.log(colors.red('ERROR AL CREAR USUARIO'))
+
+            //Regresar peticion con array de errores (error 400)
+            return res.status(400).json({errors: errors.array()})
+
+        }
+
+        //Mostrar en consola los datos recibidos
         console.log(colors.blue(req.body))
+
+
         const user = await User.create(req.body)
         res.json({data: user})
     } catch (error) {
@@ -31,11 +56,11 @@ export const getUsers = async (req: Request, res: Response) => {
     }
 }
 
-/*
-export const getProductById = async (req: Request, res: Response) => {
+
+export const getUserById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params
-        const product = await Product.findByPk(id)
+        const product = await User.findByPk(id)
 
         if(!product) {
             return res.status(404).json({
@@ -48,15 +73,7 @@ export const getProductById = async (req: Request, res: Response) => {
         console.log(error)
     }
 }
-
-export const createProduct = async (req : Request, res : Response) => {
-    try {
-        const product = await Product.create(req.body)
-        res.json({data: product})
-    } catch (error) {
-        console.log(error)
-    }
-}
+/*
 
 export const updateProduct = async (req: Request, res: Response) => {
     const { id } = req.params
