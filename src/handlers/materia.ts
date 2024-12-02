@@ -1,98 +1,88 @@
 import { Request, Response } from 'express'
 import Materia from '../models/Materia.model'
+import {check, validationResult} from 'express-validator'
 import colors from "colors";
 
 export const createMateria = async (req: Request, res: Response) => {
     try {
-        console.log(colors.blue(req.body))
-        const user = await Materia.create(req.body)
-        res.json({data: user})
+        //Ningun campo puede estar vacio
+        await check('titulo').notEmpty().withMessage('El campo titulo no puede ir vacio').run(req)
+        await check('descripcion').notEmpty().withMessage('El campo descripcion no puede ir vacio').run(req)
+        let errors = validationResult(req)
+
+        if (!errors.isEmpty()) {
+
+            //Mostrar en consola que hubo un error
+            console.log(colors.red('ERROR AL CREAR MATERIA'))
+
+            //Regresar peticion con array de errores (error 400)
+            return res.status(400).json({errors: errors.array()})
+        }
+        const materia = await Materia.create(req.body)
+        res.json({data: materia})
     } catch (error) {
         console.log(colors.red(error))
     }
 }
 
-/*export const getUsers = async (req: Request, res: Response) => {
+export const getMaterias = async (req: Request, res: Response) => {
     try {
-        const products = await User.findAll({
+        console.log(colors.green("Solicitaron a todas las materias"))
+        const materias = await Materia.findAll({
             order: [
-                ['id_usuario', 'DESC']
+                ['id_materia', 'DESC']
             ]
         })
-        res.json({data: products})
+        res.json({data: materias})
     } catch (error) {
         console.log(error)
     }
 }
 
-export const getProductById = async (req: Request, res: Response) => {
+export const getMateriaById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params
-        const product = await Product.findByPk(id)
+        const materia = await Materia.findByPk(id)
 
-        if(!product) {
+        if(!materia) {
             return res.status(404).json({
-                error: 'Producto No Encontrado'
+                error: 'Materia no encontrada'
             })
         }
 
-        res.json({data: product})
+        res.json({data: materia})
     } catch (error) {
         console.log(error)
     }
 }
 
-export const createProduct = async (req : Request, res : Response) => {
-    try {
-        const product = await Product.create(req.body)
-        res.json({data: product})
-    } catch (error) {
-        console.log(error)
-    }
-}
 
-export const updateProduct = async (req: Request, res: Response) => {
+export const updateMateria = async (req: Request, res: Response) => {
     const { id } = req.params
-    const product = await Product.findByPk(id)
+    const materia = await Materia.findByPk(id)
 
-    if(!product) {
+    if(!materia) {
         return res.status(404).json({
-            error: 'Producto No Encontrado'
+            error: 'Materia no encontrada'
         })
     }
     
     // Actualizar
-    await product.update(req.body)
-    await product.save()
-    res.json({data: product})
+    await materia.update(req.body)
+    await materia.save()
+    res.json({data: materia})
 }
 
-export const updateAvailability = async (req: Request, res: Response) => {
+export const deleteMateria = async (req: Request, res: Response) => {
     const { id } = req.params
-    const product = await Product.findByPk(id)
+    const materia = await Materia.findByPk(id)
 
-    if(!product) {
+    if(!materia) {
         return res.status(404).json({
-            error: 'Producto No Encontrado'
+            error: 'Materia no encontrada'
         })
     }
     
-    // Actualizar
-    product.availability = !product.dataValues.availability
-    await product.save()
-    res.json({data: product})
+    await materia.destroy()
+    res.json({data: 'Materia Eliminada'})
 }
-
-export const deleteProduct = async (req: Request, res: Response) => {
-    const { id } = req.params
-    const product = await Product.findByPk(id)
-
-    if(!product) {
-        return res.status(404).json({
-            error: 'Producto No Encontrado'
-        })
-    }
-    
-    await product.destroy()
-    res.json({data: 'Producto Eliminado'})
-}*/

@@ -3,21 +3,15 @@ import User from '../models/User.model'
 import {check, validationResult} from 'express-validator'
 import colors from "colors";
 
-export const test = async (req: Request, res: Response) => {
-   console.log(colors.green('Recibi la peticion test GET'))
-    res.json('Enviado correctamente')
-}
 
+// Crea usuario mediante HTTP
 export const createUser = async (req: Request, res: Response) => {
     try {
-
-
-        //Validar los campos de la peticion
+        //Ningun campo puede estar vacio
         await check('nombre').notEmpty().withMessage('El campo nombre no puede ir vacio').run(req)
         await check('email').notEmpty().withMessage('El campo email no puede ir vacio').run(req)
         await check('password').notEmpty().withMessage('El campo password no puede ir vacio').run(req)
         await check('rol').notEmpty().withMessage('El campo rol no puede ir vacio').run(req)
-
 
         let errors = validationResult(req)
 
@@ -28,13 +22,9 @@ export const createUser = async (req: Request, res: Response) => {
 
             //Regresar peticion con array de errores (error 400)
             return res.status(400).json({errors: errors.array()})
-
         }
 
-        //Mostrar en consola los datos recibidos
-        console.log(colors.blue(req.body))
-
-
+        //Enviar datos de usuario a base de datos
         const user = await User.create(req.body)
         res.json({data: user})
     } catch (error) {
@@ -42,9 +32,11 @@ export const createUser = async (req: Request, res: Response) => {
     }
 }
 
+// Obten todos los usuarios
 export const getUsers = async (req: Request, res: Response) => {
     try {
-        console.log(colors.blue("Solicitaron a todos los usuarios"))
+        console.log(colors.green("Solicitaron a todos los usuarios"))
+
         const products = await User.findAll({
             order: [
                 ['id_usuario', 'DESC']
@@ -56,67 +48,56 @@ export const getUsers = async (req: Request, res: Response) => {
     }
 }
 
-
+// Solicita usuario por id
 export const getUserById = async (req: Request, res: Response) => {
     try {
         const { id } = req.params
-        const product = await User.findByPk(id)
+        const userId = await User.findByPk(id)
 
-        if(!product) {
+        console.log(colors.green("Solicitaron al usuario:") + id)
+
+        if(!userId) {
             return res.status(404).json({
-                error: 'Producto No Encontrado'
+                error: 'Usuario no encontrado'
             })
         }
 
-        res.json({data: product})
+        res.json({data: userId})
     } catch (error) {
         console.log(error)
     }
 }
-/*
 
-export const updateProduct = async (req: Request, res: Response) => {
+// Actualizar usuario
+export const updateUser = async (req: Request, res: Response) => {
     const { id } = req.params
-    const product = await Product.findByPk(id)
+    const userID = await User.findByPk(id)
 
-    if(!product) {
+    console.log(colors.blue("Actualice al usuario con el id: " + id))
+
+    if(!userID) {
         return res.status(404).json({
-            error: 'Producto No Encontrado'
+            error: 'Usuario no encontrado'
         })
     }
     
     // Actualizar
-    await product.update(req.body)
-    await product.save()
-    res.json({data: product})
+    await userID.update(req.body)
+    await userID.save()
+    res.json({data: userID})
 }
 
-export const updateAvailability = async (req: Request, res: Response) => {
+// Eliminar usuario
+export const deleteUser = async (req: Request, res: Response) => {
     const { id } = req.params
-    const product = await Product.findByPk(id)
+    const user = await User.findByPk(id)
 
-    if(!product) {
+    if(!user) {
         return res.status(404).json({
-            error: 'Producto No Encontrado'
+            error: 'Usuario No Encontrado'
         })
     }
     
-    // Actualizar
-    product.availability = !product.dataValues.availability
-    await product.save()
-    res.json({data: product})
+    await user.destroy()
+    res.json({data: 'Usuario Eliminado'})
 }
-
-export const deleteProduct = async (req: Request, res: Response) => {
-    const { id } = req.params
-    const product = await Product.findByPk(id)
-
-    if(!product) {
-        return res.status(404).json({
-            error: 'Producto No Encontrado'
-        })
-    }
-    
-    await product.destroy()
-    res.json({data: 'Producto Eliminado'})
-}*/
